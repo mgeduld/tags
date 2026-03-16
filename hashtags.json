@@ -1,0 +1,109 @@
+{
+  "pools": {
+    "identity": {
+      "large": [
+        "#visionaryart"
+      ],
+      "mid": [
+        "#outsiderart",
+        "#artbrut",
+        "#visionaryartist"
+      ],
+      "small": [
+        "#selftaughtartist",
+        "#contemporaryoutsiderart"
+      ]
+    },
+
+    "aesthetic": {
+      "large": [
+        "#lowbrowart",
+        "#darkart",
+        "#experimentalart"
+      ],
+      "mid": [
+        "#strangeart",
+        "#modernoutsiderart"
+      ],
+      "small": [
+        "#weirdart",
+        "#bizarreart",
+        "#rawart",
+        "#neooutsiderart"
+      ]
+    },
+
+    "adjacent": {
+      "large": [
+        "#digitalillustration"
+      ],
+      "mid": [
+        "#naiveart",
+        "#oddart",
+        "#unusualart"
+      ],
+      "small": [
+        "#strangeillustration",
+        "#artbrutartist",
+        "#visionaryartcommunity",
+        "#outsiderartist",
+        "#rawartwork"
+      ]
+    },
+
+    "local": {
+      "large": [],
+      "mid": [
+        "#atlantaartist",
+        "#atlantaart",
+        "#georgiaartist"
+      ],
+      "small": [
+        "#georgiaart"
+      ]
+    },
+
+    "medium": {
+      "digital": {
+        "large": [
+          "#digitalart",
+          "#digitalpainting"
+        ],
+        "mid": [
+          "#digitalartist",
+          "#newmediaart"
+        ],
+        "small": []
+      },
+
+      "acrylic": {
+        "large": [
+          "#acrylicpainting"
+        ],
+        "mid": [
+          "#acrylicartist",
+          "#contemporarypainting"
+        ],
+        "small": [
+          "#acryliconcanvas",
+          "#paintingprocess",
+          "#studiopainting",
+          "#selftaughtpainter"
+        ]
+      }
+    }
+  },
+
+  "recipes": {
+    "countPresets": [12, 15, 18],
+    "digitalDefaultCount": 15,
+    "localTagCount": 2,
+
+    "baseCounts": {
+      "identity": 4,
+      "aesthetic": 4,
+      "adjacent": 3,
+      "medium": 4
+    }
+  }
+}
