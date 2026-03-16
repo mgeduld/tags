@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Outsider Art Hashtag Generator</title>
+    <style>
+      :root {
+        --bg: #0f1115;
+        --panel: #181c24;
+        --panel-2: #222836;
+        --panel-3: #10141d;
+        --text: #f3f4f6;
+        --muted: #aab2c5;
+        --accent: #8b5cf6;
+        --accent-2: #6d28d9;
+        --border: #30384a;
+        --success: #22c55e;
+        --warning: #f59e0b;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: linear-gradient(180deg, #0d1016 0%, #111622 100%);
+        color: var(--text);
+        min-height: 100vh;
+      }
+
+      .wrap {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 32px 20px 48px;
+      }
+
+      .card {
+        background: rgba(24, 28, 36, 0.94);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 24px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+      }
+
+      h1 {
+        margin: 0 0 10px;
+        font-size: clamp(1.8rem, 4vw, 2.7rem);
+        line-height: 1.1;
+      }
+
+      .sub {
+        margin: 0 0 24px;
+        color: var(--muted);
+        font-size: 1rem;
+        line-height: 1.6;
+      }
+
+      .notice {
+        margin-bottom: 20px;
+        padding: 14px 16px;
+        border-radius: 16px;
+        border: 1px solid rgba(245, 158, 11, 0.35);
+        background: rgba(245, 158, 11, 0.08);
+        color: #fde68a;
+      }
+
+      .notice strong {
+        color: #fef3c7;
+      }
+
+      .controls {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 14px;
+        margin-bottom: 22px;
+      }
+
+      .control-box {
+        background: var(--panel-2);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 14px;
+      }
+
+      .control-label {
+        display: block;
+        font-size: 0.82rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+        margin-bottom: 10px;
+      }
+
+      .toggle-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      button,
+      select,
+      input {
+        font: inherit;
+      }
+
+      .toggle-btn,
+      .action-btn,
+      .selectish {
+        border: 1px solid var(--border);
+        background: #151923;
+        color: var(--text);
+        border-radius: 12px;
+        padding: 10px 14px;
+        cursor: pointer;
+        transition: transform 0.08s ease, background 0.15s ease, border-color 0.15s ease;
+      }
+
+      .toggle-btn:hover,
+      .action-btn:hover,
+      .selectish:hover {
+        transform: translateY(-1px);
+      }
+
+      .toggle-btn.active {
+        background: linear-gradient(180deg, var(--accent), var(--accent-2));
+        border-color: transparent;
+      }
+
+      .action-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+
+      .action-btn.primary {
+        background: linear-gradient(180deg, var(--accent), var(--accent-2));
+        border-color: transparent;
+      }
+
+      .action-btn.success {
+        background: rgba(34, 197, 94, 0.16);
+        border-color: rgba(34, 197, 94, 0.45);
+        color: #dcfce7;
+      }
+
+      .output {
+        background: #0d1119;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 18px;
+      }
+
+      .hashtags {
+        white-space: pre-wrap;
+        word-break: break-word;
+        line-height: 1.9;
+        font-size: 1.02rem;
+        margin: 0;
+        min-height: 72px;
+      }
+
+      .meta {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 12px;
+        margin: 18px 0 0;
+      }
+
+      .meta-box {
+        background: var(--panel-2);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 12px;
+      }
+
+      .meta-box strong {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 0.95rem;
+      }
+
+      .meta-box span {
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      .range-wrap {
+        display: grid;
+        gap: 8px;
+      }
+
+      .range-row {
+        display: flex;
+        justify-content: space-between;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      input[type="range"] {
+        width: 100%;
+        cursor: pointer;
+      }
+
+      .checkbox-row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .helper {
+        color: var(--muted);
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin-top: 8px;
+      }
+
+      details {
+        margin-top: 22px;
+        background: rgba(34, 40, 54, 0.55);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 14px 16px;
+      }
+
+      summary {
+        cursor: pointer;
+        font-weight: 600;
+      }
+
+      .notes {
+        color: var(--muted);
+        line-height: 1.7;
+        margin-top: 12px;
+      }
+
+      code,
+      pre {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      }
+
+      pre {
+        background: #0d1119;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 14px;
+        overflow-x: auto;
+        color: #e5e7eb;
+      }
+
+      .pill {
+        display: inline-block;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 4px 10px;
+        background: var(--panel-3);
+        margin-right: 8px;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="card">
+        <h1>Outsider Art Hashtag Generator</h1>
+        <p class="sub">
+          Generates a fresh hashtag set for the day using your outsider / art brut / visionary tag pools.
+          It reads from a separate <code>hashtags.json</code> file in your repo, so updating tags is just a JSON edit.
+        </p>
+
+        <div id="configNotice" class="notice" hidden></div>
+
+        <div class="controls">
+          <div class="control-box">
+            <span class="control-label">Medium</span>
+            <div class="toggle-row">
+              <button id="digitalBtn" class="toggle-btn active" type="button">Digital</button>
+              <button id="acrylicBtn" class="toggle-btn" type="button">Acrylic</button>
+            </div>
+          </div>
+
+          <div class="control-box">
+            <label class="control-label" for="countSelect">Hashtag count</label>
+            <select id="countSelect" class="selectish" style="width: 100%; cursor: pointer;">
+              <option value="12">12 hashtags</option>
+              <option value="15" selected>15 hashtags</option>
+              <option value="18">18 hashtags</option>
+            </select>
+          </div>
+
+          <div class="control-box">
+            <label class="control-label" for="broadnessRange">Discovery mix</label>
+            <div class="range-wrap">
+              <input id="broadnessRange" type="range" min="0" max="100" step="1" value="35" />
+              <div class="range-row">
+                <span>More niche</span>
+                <strong id="broadnessLabel">Niche-leaning</strong>
+                <span>More broad</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="control-box">
+            <span class="control-label">Extras</span>
+            <label class="checkbox-row">
+              <input id="includeLocalTags" type="checkbox" />
+              <span>Include local tags</span>
+            </label>
+            <div class="helper">Useful for things like <span class="pill">#atlantaartist</span> and <span class="pill">#georgiaart</span>.</div>
+          </div>
+        </div>
+
+        <div class="action-row">
+          <button id="generateBtn" class="action-btn primary" type="button">Generate Today's Set</button>
+          <button id="copyBtn" class="action-btn" type="button">Copy to Clipboard</button>
+          <button id="shuffleBtn" class="action-btn" type="button">Shuffle Again</button>
+        </div>
+
+        <div class="output">
+          <pre id="hashtagsOutput" class="hashtags">Loading hashtags…</pre>
+        </div>
+
+        <div class="meta">
+          <div class="meta-box">
+            <strong>Selected medium</strong>
+            <span id="mediumMeta">Digital</span>
+          </div>
+          <div class="meta-box">
+            <strong>Total hashtags</strong>
+            <span id="countMeta">15</span>
+          </div>
+          <div class="meta-box">
+            <strong>Mix</strong>
+            <span id="mixMeta">Niche-leaning</span>
+          </div>
+          <div class="meta-box">
+            <strong>Generated</strong>
+            <span id="dateMeta"></span>
+          </div>
+        </div>
+
+        <details>
+          <summary>How to use this on GitHub Pages</summary>
+          <div class="notes">
+            <p>Put these two files in the root of your repo:</p>
+            <pre>index.html
+hashtags.json</pre>
+            <p>
+              This page fetches <code>./hashtags.json</code>. To change your tag pools, edit that JSON file,
+              commit, and GitHub Pages will serve the updated version to both of your machines.
+            </p>
+          </div>
+        </details>
+
+        <details>
+          <summary>Sample hashtags.json</summary>
+          <div class="notes">
+            <p>Save the following as <code>hashtags.json</code> next to <code>index.html</code>:</p>
+            <pre id="jsonExample"></pre>
+          </div>
+        </details>
+      </div>
+    </div>
+
+    <script>
+      const DEFAULT_CONFIG = {
+        pools: {
+          identity: {
+            large: ["#visionaryart"],
+            mid: ["#outsiderart", "#artbrut", "#visionaryartist"],
+            small: ["#selftaughtartist", "#contemporaryoutsiderart"]
+          },
+          aesthetic: {
+            large: ["#lowbrowart", "#darkart", "#experimentalart"],
+            mid: ["#strangeart", "#modernoutsiderart"],
+            small: ["#weirdart", "#bizarreart", "#rawart", "#neooutsiderart"]
+          },
+          adjacent: {
+            large: ["#digitalillustration"],
+            mid: ["#naiveart", "#oddart", "#unusualart"],
+            small: ["#strangeillustration", "#artbrutartist", "#visionaryartcommunity", "#outsiderartist", "#rawartwork"]
+          },
+          local: {
+            large: [],
+            mid: ["#atlantaartist", "#atlantaart", "#georgiaartist"],
+            small: ["#georgiaart"]
+          },
+          medium: {
+            digital: {
+              large: ["#digitalart", "#digitalpainting"],
+              mid: ["#digitalartist", "#newmediaart"],
+              small: []
+            },
+            acrylic: {
+              large: ["#acrylicpainting"],
+              mid: ["#acrylicartist", "#contemporarypainting"],
+              small: ["#acryliconcanvas", "#paintingprocess", "#studiopainting", "#selftaughtpainter"]
+            }
+          }
+        },
+        recipes: {
+          countPresets: [12, 15, 18],
+          digitalDefaultCount: 15,
+          localTagCount: 2,
+          baseCounts: {
+            identity: 4,
+            aesthetic: 4,
+            adjacent: 3,
+            medium: 4
+          }
+        }
+      };
+
+      const STORAGE_KEY = "outsider-art-hashtag-history";
+
+      const state = {
+        medium: "digital",
+        count: 15,
+        includeLocalTags: false,
+        broadness: 35,
+        config: DEFAULT_CONFIG
+      };
+
+      const digitalBtn = document.getElementById("digitalBtn");
+      const acrylicBtn = document.getElementById("acrylicBtn");
+      const countSelect = document.getElementById("countSelect");
+      const broadnessRange = document.getElementById("broadnessRange");
+      const broadnessLabel = document.getElementById("broadnessLabel");
+      const includeLocalTags = document.getElementById("includeLocalTags");
+      const generateBtn = document.getElementById("generateBtn");
+      const copyBtn = document.getElementById("copyBtn");
+      const shuffleBtn = document.getElementById("shuffleBtn");
+      const hashtagsOutput = document.getElementById("hashtagsOutput");
+      const mediumMeta = document.getElementById("mediumMeta");
+      const countMeta = document.getElementById("countMeta");
+      const mixMeta = document.getElementById("mixMeta");
+      const dateMeta = document.getElementById("dateMeta");
+      const jsonExample = document.getElementById("jsonExample");
+      const configNotice = document.getElementById("configNotice");
+
+      function mulberry32(seed) {
+        return function () {
+          let t = (seed += 0x6d2b79f5);
+          t = Math.imul(t ^ (t >>> 15), t | 1);
+          t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+
+      function hashString(str) {
+        let hash = 1779033703 ^ str.length;
+        for (let i = 0; i < str.length; i++) {
+          hash = Math.imul(hash ^ str.charCodeAt(i), 3432918353);
+          hash = (hash << 13) | (hash >>> 19);
+        }
+        return () => {
+          hash = Math.imul(hash ^ (hash >>> 16), 2246822507);
+          hash = Math.imul(hash ^ (hash >>> 13), 3266489909);
+          return (hash ^= hash >>> 16) >>> 0;
+        };
+      }
+
+      function unique(list) {
+        return [...new Set(list.filter(Boolean))];
+      }
+
+      function sample(array, amount, rng) {
+        const copy = [...array];
+        for (let i = copy.length - 1; i > 0; i--) {
+          const j = Math.floor(rng() * (i + 1));
+          [copy[i], copy[j]] = [copy[j], copy[i]];
+        }
+        return copy.slice(0, Math.min(amount, copy.length));
+      }
+
+      function loadHistory() {
+        try {
+          const raw = window.localStorage.getItem(STORAGE_KEY);
+          if (!raw) return {};
+          const parsed = JSON.parse(raw);
+          return parsed && typeof parsed === "object" ? parsed : {};
+        } catch {
+          return {};
+        }
+      }
+
+      function saveHistory(history) {
+        try {
+          window.localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+        } catch {
+          // Ignore storage failures.
+        }
+      }
+
+      function getHistoryKey() {
+        return `${state.medium}-${state.includeLocalTags}-${state.count}`;
+      }
+
+      function getTagUsageMap() {
+        const history = loadHistory();
+        return history[getHistoryKey()] || {};
+      }
+
+      function updateTagUsage(tags) {
+        const history = loadHistory();
+        const key = getHistoryKey();
+        const current = history[key] || {};
+
+        for (const tag of tags) {
+          current[tag] = (current[tag] || 0) + 1;
+        }
+
+        history[key] = current;
+        saveHistory(history);
+      }
+
+      function getTodaySeedKey() {
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, "0");
+        const dd = String(today.getDate()).padStart(2, "0");
+        return `${yyyy}-${mm}-${dd}-${state.medium}-${state.count}-${state.includeLocalTags}-${state.broadness}`;
+      }
+
+      function getRngForToday() {
+        const seedFn = hashString(getTodaySeedKey());
+        return mulberry32(seedFn());
+      }
+
+      function categoryWeightsFromBroadness(value) {
+        if (value <= 25) {
+          return { large: 0.1, mid: 0.35, small: 0.55, label: "Very niche" };
+        }
+        if (value <= 45) {
+          return { large: 0.15, mid: 0.45, small: 0.4, label: "Niche-leaning" };
+        }
+        if (value <= 65) {
+          return { large: 0.25, mid: 0.5, small: 0.25, label: "Balanced" };
+        }
+        if (value <= 85) {
+          return { large: 0.4, mid: 0.45, small: 0.15, label: "Broad-leaning" };
+        }
+        return { large: 0.55, mid: 0.35, small: 0.1, label: "Very broad" };
+      }
+
+      function weightedFreshSample(array, amount, rng, usageMap, currentSelection = []) {
+        const available = [...new Set(array)].filter(tag => !currentSelection.includes(tag));
+        const chosen = [];
+
+        while (chosen.length < amount && available.length > 0) {
+          const weightedPool = available.map(tag => {
+            const count = usageMap[tag] || 0;
+            const freshnessWeight = 1 / (1 + count);
+            const jitter = 0.85 + rng() * 0.3;
+            return { tag, weight: freshnessWeight * jitter };
+          });
+
+          const totalWeight = weightedPool.reduce((sum, item) => sum + item.weight, 0);
+          let cursor = rng() * totalWeight;
+          let pickedIndex = 0;
+
+          for (let i = 0; i < weightedPool.length; i++) {
+            cursor -= weightedPool[i].weight;
+            if (cursor <= 0) {
+              pickedIndex = i;
+              break;
+            }
+          }
+
+          const pickedTag = weightedPool[pickedIndex].tag;
+          chosen.push(pickedTag);
+          available.splice(available.indexOf(pickedTag), 1);
+        }
+
+        return chosen;
+      }
+
+      function pickBySizeGroups(groupedPool, amount, rng, weights, usageMap, currentSelection = []) {
+        const largeTarget = Math.round(amount * weights.large);
+        const smallTarget = Math.round(amount * weights.small);
+        const midTarget = Math.max(0, amount - largeTarget - smallTarget);
+
+        let picked = [
+          ...weightedFreshSample(groupedPool.large || [], largeTarget, rng, usageMap, currentSelection),
+          ...weightedFreshSample(groupedPool.mid || [], midTarget, rng, usageMap, currentSelection),
+          ...weightedFreshSample(groupedPool.small || [], smallTarget, rng, usageMap, currentSelection)
+        ];
+
+        if (picked.length < amount) {
+          const leftovers = unique([
+            ...(groupedPool.large || []),
+            ...(groupedPool.mid || []),
+            ...(groupedPool.small || [])
+          ]).filter(tag => !picked.includes(tag) && !currentSelection.includes(tag));
+          picked = picked.concat(
+            weightedFreshSample(leftovers, amount - picked.length, rng, usageMap, currentSelection.concat(picked))
+          );
+        }
+
+        return picked.slice(0, amount);
+      }
+
+      function buildHashtagSet({ useTodaySeed = true } = {}) {
+        const rng = useTodaySeed ? getRngForToday() : Math.random;
+        const config = state.config;
+        const weights = categoryWeightsFromBroadness(state.broadness);
+        const counts = config.recipes.baseCounts;
+        const usageMap = getTagUsageMap();
+        const tags = [];
+
+        tags.push(...pickBySizeGroups(config.pools.identity, counts.identity, rng, weights, usageMap, tags));
+        tags.push(...pickBySizeGroups(config.pools.aesthetic, counts.aesthetic, rng, weights, usageMap, tags));
+        tags.push(...pickBySizeGroups(config.pools.adjacent, counts.adjacent, rng, weights, usageMap, tags));
+        tags.push(...pickBySizeGroups(config.pools.medium[state.medium], counts.medium, rng, weights, usageMap, tags));
+
+        if (state.includeLocalTags) {
+          tags.push(...pickBySizeGroups(config.pools.local, config.recipes.localTagCount, rng, weights, usageMap, tags));
+        }
+
+        const uniqueTags = unique(tags);
+        if (uniqueTags.length < state.count) {
+          const everything = unique([
+            ...config.pools.identity.large, ...config.pools.identity.mid, ...config.pools.identity.small,
+            ...config.pools.aesthetic.large, ...config.pools.aesthetic.mid, ...config.pools.aesthetic.small,
+            ...config.pools.adjacent.large, ...config.pools.adjacent.mid, ...config.pools.adjacent.small,
+            ...config.pools.medium[state.medium].large, ...config.pools.medium[state.medium].mid, ...config.pools.medium[state.medium].small,
+            ...(state.includeLocalTags ? [...config.pools.local.large, ...config.pools.local.mid, ...config.pools.local.small] : [])
+          ]).filter(tag => !uniqueTags.includes(tag));
+          uniqueTags.push(...weightedFreshSample(everything, state.count - uniqueTags.length, rng, usageMap, uniqueTags));
+        }
+
+        return unique(uniqueTags).slice(0, state.count);
+      }
+
+      function renderHashtags(tags) {
+        hashtagsOutput.textContent = tags.join(" ");
+        const mixLabel = categoryWeightsFromBroadness(state.broadness).label;
+        mediumMeta.textContent = state.medium.charAt(0).toUpperCase() + state.medium.slice(1);
+        countMeta.textContent = String(tags.length);
+        mixMeta.textContent = mixLabel;
+        broadnessLabel.textContent = mixLabel;
+        dateMeta.textContent = new Date().toLocaleDateString(undefined, {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric"
+        });
+      }
+
+      function generateAndRender({ useTodaySeed = true } = {}) {
+        const tags = buildHashtagSet({ useTodaySeed });
+        renderHashtags(tags);
+        updateTagUsage(tags);
+      }
+
+      function setMedium(nextMedium) {
+        state.medium = nextMedium;
+        digitalBtn.classList.toggle("active", nextMedium === "digital");
+        acrylicBtn.classList.toggle("active", nextMedium === "acrylic");
+        generateAndRender({ useTodaySeed: true });
+      }
+
+      async function copyToClipboard() {
+        const text = hashtagsOutput.textContent.trim();
+        if (!text) return;
+
+        try {
+          await navigator.clipboard.writeText(text);
+          copyBtn.textContent = "Copied";
+          copyBtn.classList.add("success");
+          window.setTimeout(() => {
+            copyBtn.textContent = "Copy to Clipboard";
+            copyBtn.classList.remove("success");
+          }, 1200);
+        } catch (error) {
+          alert("Copy failed on this browser. You can still select the hashtags manually.");
+        }
+      }
+
+      async function loadConfig() {
+        jsonExample.textContent = JSON.stringify(DEFAULT_CONFIG, null, 2);
+
+        try {
+          const response = await fetch("./hashtags.json", { cache: "no-store" });
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+          const loaded = await response.json();
+          state.config = loaded;
+          configNotice.hidden = false;
+          configNotice.innerHTML = `<strong>Loaded:</strong> Using <code>hashtags.json</code> from your repo.`;
+        } catch (error) {
+          state.config = DEFAULT_CONFIG;
+          configNotice.hidden = false;
+          configNotice.innerHTML = `<strong>Fallback mode:</strong> Could not load <code>hashtags.json</code>, so the page is using built-in defaults. Add that file to your repo to control the tags from JSON.`;
+        }
+
+        const presets = state.config.recipes?.countPresets || [12, 15, 18];
+        const defaultCount = state.config.recipes?.digitalDefaultCount || 15;
+        countSelect.innerHTML = presets.map(value => `<option value="${value}">${value} hashtags</option>`).join("");
+        state.count = presets.includes(defaultCount) ? defaultCount : presets[0];
+        countSelect.value = String(state.count);
+
+        generateAndRender({ useTodaySeed: true });
+      }
+
+      digitalBtn.addEventListener("click", () => setMedium("digital"));
+      acrylicBtn.addEventListener("click", () => setMedium("acrylic"));
+
+      countSelect.addEventListener("change", event => {
+        state.count = Number(event.target.value);
+        generateAndRender({ useTodaySeed: true });
+      });
+
+      broadnessRange.addEventListener("input", event => {
+        state.broadness = Number(event.target.value);
+        generateAndRender({ useTodaySeed: true });
+      });
+
+      includeLocalTags.addEventListener("change", event => {
+        state.includeLocalTags = event.target.checked;
+        generateAndRender({ useTodaySeed: true });
+      });
+
+      generateBtn.addEventListener("click", () => {
+        generateAndRender({ useTodaySeed: true });
+      });
+
+      shuffleBtn.addEventListener("click", () => {
+        generateAndRender({ useTodaySeed: false });
+      });
+
+      copyBtn.addEventListener("click", copyToClipboard);
+
+      loadConfig();
+    </script>
+  </body>
+</html>
